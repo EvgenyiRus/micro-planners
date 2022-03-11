@@ -1,4 +1,4 @@
-package com.example.micro.planner.plannerconfig;
+package com.example.micro.planner.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
