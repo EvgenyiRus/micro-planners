@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'com.example.micro.planner:planner-entity'
+    implementation 'com.example.micro.planner:planner-utils'
 
     // драйвер БД
     runtimeOnly 'org.postgresql:postgresql'
