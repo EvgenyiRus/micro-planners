@@ -55,7 +55,7 @@ public class Task implements Serializable {
     private Category category;
 
     @Column(name = "user_id")
-    private long userId;
+    private Long userId;
 
     @Override
     public boolean equals(Object o) {

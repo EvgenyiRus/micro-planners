@@ -37,13 +37,11 @@ public class User {
 
     private String username;
 
-    @Column(name = "userpassword")
     private String password;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "users")
     private Set<Role> roles;
-
 
     @Override
     public boolean equals(Object o) {

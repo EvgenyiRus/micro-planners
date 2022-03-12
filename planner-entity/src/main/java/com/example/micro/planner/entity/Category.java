@@ -46,7 +46,7 @@ public class Category implements Serializable {
     private Long uncompletedCount;
 
     @Column(name = "user_id")
-    private long userId;
+    private Long userId;
 
     @Override
     public boolean equals(Object o) {
