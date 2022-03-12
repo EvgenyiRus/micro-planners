@@ -1,7 +1,5 @@
 package com.example.micro.planner.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +12,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-/*
-
-задачи пользователя
-
- */
-
+//задачи пользователя
 @Entity
 @Table(name = "task", schema = "todo", catalog = "planner_todo")
 @NoArgsConstructor
