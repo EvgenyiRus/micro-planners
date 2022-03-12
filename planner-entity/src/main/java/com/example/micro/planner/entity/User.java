@@ -1,12 +1,8 @@
 package com.example.micro.planner.entity;
 
-
-
-/*
-
-пользователь - основной объект, с которым связаны все остальные (через внешние ключи)
-
- */
+/**
+    пользователь - основной объект, с которым связаны все остальные (через внешние ключи)
+ **/
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -20,7 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "user_data", schema = "todolist", catalog = "postgres")
+@Table(name = "user_data", schema = "users", catalog = "planner_users")
 @Setter
 @Getter
 @AllArgsConstructor

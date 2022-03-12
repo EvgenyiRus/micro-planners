@@ -88,6 +88,23 @@ public class CategoryController {
         return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 без объектов (операция прошла успешно)
     }
 
+    // для удаления используем тип запроса DELETE и передаем ID для удаления
+    // можно также использовать метод POST и передавать ID в теле запроса
+    @PostMapping("/delete2")
+    public ResponseEntity delete2(@RequestBody Long id) {
+
+        // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
+        // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
+        try {
+            categoryService.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            e.printStackTrace();
+            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 без объектов (операция прошла успешно)
+    }
+
 
     // поиск по любым параметрам CategorySearchValues
     @PostMapping("/search")
