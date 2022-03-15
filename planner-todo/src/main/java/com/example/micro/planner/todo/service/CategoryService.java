@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
-
 @Service
 // все методы класса должны выполниться без ошибки, чтобы транзакция завершилась
 // если в методе выполняются несолько SQL запросов и возникнет исключение - то все выполненные операции откатятся (Rollback)
@@ -48,6 +47,4 @@ public class CategoryService {
     public Category findById(Long id) {
         return repository.findById(id).get(); // т.к. возвращается Optional - можно получить объект методом get()
     }
-
-
 }
