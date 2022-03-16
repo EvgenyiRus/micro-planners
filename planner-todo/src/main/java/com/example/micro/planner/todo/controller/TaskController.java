@@ -3,6 +3,7 @@ package com.example.micro.planner.todo.controller;
 import com.example.micro.planner.entity.Task;
 import com.example.micro.planner.todo.search.TaskSearchValues;
 import com.example.micro.planner.todo.service.TaskService;
+import com.example.micro.planner.utils.resttemplate.UserRestBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,9 +37,13 @@ public class TaskController {
     public static final String ID_COLUMN = "id"; // имя столбца id
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
+    // микросервисы для работы с пользователями
+    private UserRestBuilder userRestBuilder;
+
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder) {
+        this.userRestBuilder = userRestBuilder;
         this.taskService = taskService;
     }
 
@@ -62,7 +67,14 @@ public class TaskController {
         if (task.getTitle() == null || task.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(taskService.add(task)); // возвращаем созданный объект со сгенерированным id
+
+        // проверка на пользователя, вызовом мс из другого модуля
+        if(userRestBuilder.userExists(task.getUserId())) {
+            return ResponseEntity.ok(taskService.add(task));  // возвращаем добавленный объект
+        }
+
+        // пользователь не найден
+        return new ResponseEntity(String.format("user id = %d not found", task.getUserId()), HttpStatus.ACCEPTED);
     }
 
     // обновление

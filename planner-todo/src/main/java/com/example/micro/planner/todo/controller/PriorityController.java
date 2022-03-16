@@ -3,6 +3,7 @@ package com.example.micro.planner.todo.controller;
 import com.example.micro.planner.entity.Priority;
 import com.example.micro.planner.todo.search.PrioritySearchValues;
 import com.example.micro.planner.todo.service.PriorityService;
+import com.example.micro.planner.utils.resttemplate.UserRestBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,13 @@ public class PriorityController {
     // доступ к данным из БД
     private final PriorityService priorityService;
 
+    // микросервисы для работы с пользователями
+    private UserRestBuilder userRestBuilder;
+
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService) {
+    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder) {
+        this.userRestBuilder = userRestBuilder;
         this.priorityService = priorityService;
     }
 
@@ -56,8 +61,14 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-        // save работает как на добавление, так и на обновление
-        return ResponseEntity.ok(priorityService.add(priority));
+
+        // проверка на пользователя, вызовом мс из другого модуля
+        if(userRestBuilder.userExists(priority.getUserId())) {
+            return ResponseEntity.ok(priorityService.add(priority));  // возвращаем добавленный объект
+        }
+
+        // пользователь не найден
+        return new ResponseEntity(String.format("user id = %d not found", priority.getUserId()), HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/update")
