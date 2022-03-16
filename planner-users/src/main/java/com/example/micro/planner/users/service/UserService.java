@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 // все методы класса должны выполниться без ошибки, чтобы транзакция завершилась
@@ -40,8 +41,8 @@ public class UserService {
         repository.deleteByEmail(email);
     }
 
-    public User findById(Long id) {
-        return repository.findById(id).get(); // т.к. возвращается Optional - можно получить объект методом get()
+    public Optional<User> findById(Long id) {
+        return repository.findById(id); // т.к. возвращается Optional - можно получить объект методом get()
     }
 
     public Page<User> findByParams(String username, String password, PageRequest paging) {

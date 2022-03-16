@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user") // базовый URI
@@ -111,17 +112,19 @@ public class UserController {
     // получение объекта по id
     @PostMapping("/id")
     public ResponseEntity<User> findById(@RequestBody Long id) {
-        User user;
+        Optional<User> user = userService.findById(id);
 
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try {
-            user = userService.findById(id);
+            if (user.isPresent()) {
+                return ResponseEntity.ok(user.get());
+            }
         } catch (NoSuchElementException e) { // если объект не будет найден
             e.printStackTrace();
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(user);
+        return new ResponseEntity(String.format("user id = %d not found", id), HttpStatus.ACCEPTED);
     }
 
     // получение уникального объекта по email

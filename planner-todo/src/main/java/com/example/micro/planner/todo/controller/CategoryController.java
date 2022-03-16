@@ -3,6 +3,7 @@ package com.example.micro.planner.todo.controller;
 import com.example.micro.planner.entity.Category;
 import com.example.micro.planner.todo.search.CategorySearchValues;
 import com.example.micro.planner.todo.service.CategoryService;
+import com.example.micro.planner.utils.resttemplate.UserRestBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,17 @@ import java.util.NoSuchElementException;
 public class CategoryController {
 
     // доступ к данным из БД
-    private final CategoryService categoryService;
+    private CategoryService categoryService;
+
+    // микросервисы для работы с пользователями
+    private UserRestBuilder userRestBuilder;
+
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder) {
         this.categoryService = categoryService;
+        this.userRestBuilder = userRestBuilder;
     }
 
     @PostMapping("/all")
@@ -39,6 +45,7 @@ public class CategoryController {
 
         // проверка на обязательные параметры
         if (category.getId() != null && category.getId() != 0) { // это означает, что id заполнено
+
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
             return new ResponseEntity("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE);
         }
@@ -48,7 +55,13 @@ public class CategoryController {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(categoryService.add(category)); // возвращаем добавленный объект с заполненным ID
+        // проверка на пользователя, вызовом мс из другого модуля
+        if(userRestBuilder.userExists(category.getUserId())) {
+            return ResponseEntity.ok(categoryService.add(category));  // возвращаем добавленный объект
+        }
+
+        // пользователь не найден
+        return new ResponseEntity(String.format("user id = %d not found", category.getUserId()), HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/update")
