@@ -18,7 +18,6 @@ public class LoggingAspect {
     @Around("execution(* com.example.micro.planner.todo.controller..*(..)))")
     public Object profileControllerMethods(ProceedingJoinPoint proceedingJoinPoint) throws Throwable
     {
-
         // считываем метаданные - что сейчас выполняется
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
 
@@ -28,7 +27,7 @@ public class LoggingAspect {
         log.info("-------- Executing "+ className + "." + methodName + "   ----------- ");
         StopWatch countdown = new StopWatch();
 
-        //  засекаем время
+        // засекаем время
         countdown.start();
         Object result = proceedingJoinPoint.proceed(); // выполняем сам метод
         countdown.stop();

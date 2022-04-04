@@ -3,7 +3,7 @@ package com.example.micro.planner.todo.controller;
 import com.example.micro.planner.entity.Category;
 import com.example.micro.planner.todo.search.CategorySearchValues;
 import com.example.micro.planner.todo.service.CategoryService;
-import com.example.micro.planner.utils.resttemplate.UserRestBuilder;
+import com.example.micro.planner.utils.userBuilder.UserBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +22,16 @@ import java.util.NoSuchElementException;
 public class CategoryController {
 
     // доступ к данным из БД
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     // микросервисы для работы с пользователями
-    private UserRestBuilder userRestBuilder;
-
+    private final UserBuilder userBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder) {
+    public CategoryController(CategoryService categoryService, UserBuilder userWebClientBuilder) {
         this.categoryService = categoryService;
-        this.userRestBuilder = userRestBuilder;
+        this.userBuilder = userWebClientBuilder;
     }
 
     @PostMapping("/all")
@@ -56,7 +55,7 @@ public class CategoryController {
         }
 
         // проверка на пользователя, вызовом мс из другого модуля
-        if(userRestBuilder.userExists(category.getUserId())) {
+        if (userBuilder.userExists(category.getUserId())) {
             return ResponseEntity.ok(categoryService.add(category));  // возвращаем добавленный объект
         }
 
@@ -85,7 +84,6 @@ public class CategoryController {
 
 
     // для удаления используем тип запроса DELETE и передаем ID для удаления
-    // можно также использовать метод POST и передавать ID в теле запроса
     @DeleteMapping("/delete/{id}")
     public ResponseEntity delete(@PathVariable("id") Long id) {
 
@@ -118,7 +116,6 @@ public class CategoryController {
         return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 без объектов (операция прошла успешно)
     }
 
-
     // поиск по любым параметрам CategorySearchValues
     @PostMapping("/search")
     public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues) {
@@ -133,7 +130,6 @@ public class CategoryController {
 
         return ResponseEntity.ok(list);
     }
-
 
     // параметр id передаются не в BODY запроса, а в самом URL
     @PostMapping("/id")

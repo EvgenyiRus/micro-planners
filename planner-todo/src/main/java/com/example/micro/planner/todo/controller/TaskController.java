@@ -3,7 +3,8 @@ package com.example.micro.planner.todo.controller;
 import com.example.micro.planner.entity.Task;
 import com.example.micro.planner.todo.search.TaskSearchValues;
 import com.example.micro.planner.todo.service.TaskService;
-import com.example.micro.planner.utils.resttemplate.UserRestBuilder;
+import com.example.micro.planner.utils.userBuilder.UserBuilder;
+import com.example.micro.planner.utils.userBuilder.resttemplate.UserRestBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,12 +39,12 @@ public class TaskController {
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
     // микросервисы для работы с пользователями
-    private UserRestBuilder userRestBuilder;
+    private UserBuilder userBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder) {
-        this.userRestBuilder = userRestBuilder;
+    public TaskController(TaskService taskService, UserBuilder userWebClientBuilder) {
+        this.userBuilder = userWebClientBuilder;
         this.taskService = taskService;
     }
 
@@ -69,7 +70,7 @@ public class TaskController {
         }
 
         // проверка на пользователя, вызовом мс из другого модуля
-        if(userRestBuilder.userExists(task.getUserId())) {
+        if(userBuilder.userExists(task.getUserId())) {
             return ResponseEntity.ok(taskService.add(task));  // возвращаем добавленный объект
         }
 

@@ -1,6 +1,7 @@
-package com.example.micro.planner.utils.resttemplate;
+package com.example.micro.planner.utils.userBuilder.resttemplate;
 
 import com.example.micro.planner.entity.User;
+import com.example.micro.planner.utils.userBuilder.UserBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -8,8 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * RestTemplate - deprecated -> лучше использовать WebClient (см. UserWebClientBuilder)
+ **/
+
 @Component
-public class UserRestBuilder {
+public class UserRestBuilder implements UserBuilder {
 
     private static final String BASE_URL = "http://localhost:8765/planner-users/user/";
 
