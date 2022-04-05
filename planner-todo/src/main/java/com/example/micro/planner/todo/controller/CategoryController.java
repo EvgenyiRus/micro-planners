@@ -4,6 +4,7 @@ import com.example.micro.planner.entity.Category;
 import com.example.micro.planner.todo.search.CategorySearchValues;
 import com.example.micro.planner.todo.service.CategoryService;
 import com.example.micro.planner.utils.userBuilder.UserBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
     Названия методов могут быть любыми, главное не дублировать их имена внутри класса и URL mapping
  **/
 @RestController
+@Slf4j
 @RequestMapping("/category") // базовый URI
 public class CategoryController {
 
@@ -54,10 +56,19 @@ public class CategoryController {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        // проверка на пользователя, вызовом мс из другого модуля
+        /* проверка существования пользователя, вызовом мс из другого модуля
+        метод вызывается синхронно, т.е. необходимо дождаться пока метод выполнится до конца
+        */
         if (userBuilder.userExists(category.getUserId())) {
             return ResponseEntity.ok(categoryService.add(category));  // возвращаем добавленный объект
         }
+
+        /* проверка существования пользователя, вызовом мс из другого модуля
+        метод вызывается асинхронно, т.е. не дождавшись окончания работы метода будет вызван следующий метод (return new ... )
+        subscribe - подписка на результат работы мс. Метод "userExistsAsync" выполняется паралл-о. Возвращается User
+        для работы приложения здесь это не требуется
+        */
+        //userBuilder.userExistsAsync(category.getUserId()).subscribe((user->log.debug(String.valueOf(user)));
 
         // пользователь не найден
         return new ResponseEntity(String.format("user id = %d not found", category.getUserId()), HttpStatus.ACCEPTED);

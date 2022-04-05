@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.publisher.Flux;
 
 /**
  * RestTemplate - deprecated -> лучше использовать WebClient (см. UserWebClientBuilder)
@@ -33,5 +34,10 @@ public class UserRestBuilder implements UserBuilder {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public Flux<User> userExistsAsync(Long userId) {
+        return null;
     }
 }

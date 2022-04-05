@@ -4,12 +4,25 @@ import com.example.micro.planner.entity.User;
 import com.example.micro.planner.utils.userBuilder.UserBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 @Component
 public class UserWebClientBuilder implements UserBuilder {
 
     private static final String BASE_URL = "http://localhost:8765/planner-users/user/";
 
+    // асинхронный вызов проверки существования пользователя
+    // контейнер Flux позоваляет получать результат асинхронно
+    public Flux<User> userExistsAsync(Long userId) {
+        return WebClient.create(BASE_URL)
+                .post()
+                .uri("id")
+                .bodyValue(userId)
+                .retrieve()
+                .bodyToFlux(User.class);
+    }
+
+    // синхронный вызов
     public boolean userExists(Long userId) {
         try {
             User user = WebClient.create(BASE_URL) // https://reflectoring.io/spring-webclient/
