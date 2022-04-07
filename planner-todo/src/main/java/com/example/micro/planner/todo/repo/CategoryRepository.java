@@ -7,12 +7,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // поиск категорий пользователя (по названию)
     List<Category> findByUserIdOrderByTitleAsc(Long userId);
+
+    Optional<Category> findByTitle(String title);
 
     // поиск значений по названию для конкретного пользователя
     @Query("SELECT c FROM Category c where " +

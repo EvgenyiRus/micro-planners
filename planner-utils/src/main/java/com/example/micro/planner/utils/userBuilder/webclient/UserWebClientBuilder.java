@@ -10,6 +10,7 @@ import reactor.core.publisher.Flux;
 public class UserWebClientBuilder implements UserBuilder {
 
     private static final String BASE_URL = "http://localhost:8765/planner-users/user/";
+    private static final String BASE_DATA = "http://localhost:8765/planner-todo/data/";
 
     // асинхронный вызов проверки существования пользователя
     // контейнер Flux позоваляет получать результат асинхронно
@@ -39,5 +40,14 @@ public class UserWebClientBuilder implements UserBuilder {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public Flux<Boolean> initUserData(Long userId) {
+        return WebClient.create(BASE_DATA)
+                .post()
+                .uri("init")
+                .bodyValue(userId)
+                .retrieve()
+                .bodyToFlux(Boolean.class);
     }
 }

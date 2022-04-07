@@ -2,13 +2,11 @@ package com.example.micro.planner.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.beans.ConstructorProperties;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -47,6 +45,11 @@ public class Category implements Serializable {
 
     @Column(name = "user_id")
     private Long userId;
+
+    public Category(String title, Long userId) {
+        this.title = title;
+        this.userId = userId;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,24 +1,17 @@
 package com.example.micro.planner.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.beans.ConstructorProperties;
 import java.io.Serializable;
 import java.util.Objects;
 
-/*
-
-справочноное значение - приоритет пользователя
-может использовать для своих задач
-
- */
-
-
+/**
+ * справочноное значение - приоритет пользователя
+ * может использовать для своих задач
+ **/
 @Entity
 @Table(name = "priority", schema = "todo", catalog = "planner_todo")
 @NoArgsConstructor
@@ -35,7 +28,10 @@ public class Priority implements Serializable {
     @Id
     private Long id;
 
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "color")
     private String color;
 
     @Column(name = "user_id")

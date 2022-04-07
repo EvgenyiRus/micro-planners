@@ -4,7 +4,6 @@ import com.example.micro.planner.entity.Task;
 import com.example.micro.planner.todo.search.TaskSearchValues;
 import com.example.micro.planner.todo.service.TaskService;
 import com.example.micro.planner.utils.userBuilder.UserBuilder;
-import com.example.micro.planner.utils.userBuilder.resttemplate.UserRestBuilder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +38,7 @@ public class TaskController {
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
 
     // микросервисы для работы с пользователями
-    private UserBuilder userBuilder;
+    private final UserBuilder userBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "

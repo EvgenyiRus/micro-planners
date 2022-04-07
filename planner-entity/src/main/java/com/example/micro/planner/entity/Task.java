@@ -1,9 +1,6 @@
 package com.example.micro.planner.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 
@@ -17,6 +14,7 @@ import java.util.Objects;
 @Table(name = "task", schema = "todo", catalog = "planner_todo")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Setter
 @Getter
 @Cacheable

@@ -47,4 +47,9 @@ public class CategoryService {
     public Category findById(Long id) {
         return repository.findById(id).get(); // т.к. возвращается Optional - можно получить объект методом get()
     }
+
+    // поиск категории по ID
+    public Category findByTitle(String title) {
+        return repository.findByTitle(title).orElseThrow(); // т.к. возвращается Optional - можно получить объект методом get()
+    }
 }

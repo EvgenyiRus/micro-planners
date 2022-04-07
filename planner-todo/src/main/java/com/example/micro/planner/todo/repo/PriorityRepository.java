@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 // принцип ООП: абстракция-реализация - здесь описываем все доступные способы доступа к данным
 @Repository
@@ -14,6 +15,9 @@ public interface PriorityRepository extends JpaRepository<Priority, Long> {
 
     // поиск всех значений данного пользователя
     List<Priority> findByUserIdOrderByIdAsc(Long userId);
+
+    // поиск по названию
+    Optional<Priority> findByTitle(String title);
 
     // поиск значений по названию для конкретного пользователя
     @Query("SELECT p FROM Priority p where " +

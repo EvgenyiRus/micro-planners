@@ -3,6 +3,8 @@ package com.example.micro.planner.users.controller;
 import com.example.micro.planner.entity.User;
 import com.example.micro.planner.users.search.UserSearchValues;
 import com.example.micro.planner.users.service.UserService;
+import com.example.micro.planner.utils.userBuilder.webclient.UserWebClientBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,15 +18,18 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user") // базовый URI
+@Slf4j
 public class UserController {
 
     public static final String ID_COLUMN = "id"; // сортируемый столбец
     private final UserService userService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
+    private final UserWebClientBuilder userWebClientBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserWebClientBuilder userWebClientBuilder) {
         this.userService = userService;
+        this.userWebClientBuilder = userWebClientBuilder;
     }
 
     @PostMapping("/add")
@@ -33,7 +38,7 @@ public class UserController {
         // проверка на обязательные параметры
         if (user.getId() != null && user.getId() != 0) {
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
-            return new ResponseEntity("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity("redundant param: id must be null", HttpStatus.NOT_ACCEPTABLE);
         }
 
         // если передали пустое значение
@@ -49,7 +54,12 @@ public class UserController {
             return new ResponseEntity("missed param: username", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(userService.add(user)); // возвращаем созданный объект со сгенерированным id
+        user = userService.add(user);
+        if (user != null) {
+            userWebClientBuilder.initUserData(user.getId()).subscribe(result -> log.info("user populated: " + result));
+        }
+
+        return ResponseEntity.ok(user); // возвращаем созданный объект со сгенерированным id
     }
 
     @PutMapping("/update")

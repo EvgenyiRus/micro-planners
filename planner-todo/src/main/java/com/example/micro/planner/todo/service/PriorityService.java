@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 // все методы класса должны выполниться без ошибки, чтобы транзакция завершилась
@@ -21,6 +22,10 @@ public class PriorityService {
 
     public List<Priority> findAll(Long userId) {
         return repository.findByUserIdOrderByIdAsc(userId);
+    }
+
+    public Priority findByTitle(String title) {
+        return repository.findByTitle(title).orElseThrow();
     }
 
     public Priority add(Priority priority) {
