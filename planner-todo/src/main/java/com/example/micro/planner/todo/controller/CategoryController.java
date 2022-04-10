@@ -1,6 +1,7 @@
 package com.example.micro.planner.todo.controller;
 
 import com.example.micro.planner.entity.Category;
+import com.example.micro.planner.todo.feign.UserFeignClient;
 import com.example.micro.planner.todo.search.CategorySearchValues;
 import com.example.micro.planner.todo.service.CategoryService;
 import com.example.micro.planner.utils.userBuilder.UserBuilder;
@@ -29,11 +30,15 @@ public class CategoryController {
     // микросервисы для работы с пользователями
     private final UserBuilder userBuilder;
 
+    private final UserFeignClient userFeignClient;
+
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserBuilder userWebClientBuilder) {
+    public CategoryController(CategoryService categoryService, UserBuilder userWebClientBuilder,
+                              UserFeignClient userFeignClient) {
         this.categoryService = categoryService;
         this.userBuilder = userWebClientBuilder;
+        this.userFeignClient = userFeignClient;
     }
 
     @PostMapping("/all")
@@ -56,19 +61,25 @@ public class CategoryController {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        /* проверка существования пользователя, вызовом мс из другого модуля
+        /* 1. проверка существования пользователя, вызовом мс из другого модуля
         метод вызывается синхронно, т.е. необходимо дождаться пока метод выполнится до конца
+        С помощью RestTemplate
         */
-        if (userBuilder.userExists(category.getUserId())) {
-            return ResponseEntity.ok(categoryService.add(category));  // возвращаем добавленный объект
-        }
+//        if (userBuilder.userExists(category.getUserId())) {
+//            return ResponseEntity.ok(categoryService.add(category));  // возвращаем добавленный объект
+//        }
 
-        /* проверка существования пользователя, вызовом мс из другого модуля
+        /* 2. проверка существования пользователя, вызовом мс из другого модуля
         метод вызывается асинхронно, т.е. не дождавшись окончания работы метода будет вызван следующий метод (return new ... )
         subscribe - подписка на результат работы мс. Метод "userExistsAsync" выполняется паралл-о. Возвращается User
         для работы приложения здесь это не требуется
         */
         //userBuilder.userExistsAsync(category.getUserId()).subscribe((user->log.debug(String.valueOf(user)));
+
+        // 3. вызов мс с помощью feign
+        if (userFeignClient.findUserById(category.getUserId()) != null) {
+            return ResponseEntity.ok(categoryService.add(category));
+        }
 
         // пользователь не найден
         return new ResponseEntity(String.format("user id = %d not found", category.getUserId()), HttpStatus.ACCEPTED);
