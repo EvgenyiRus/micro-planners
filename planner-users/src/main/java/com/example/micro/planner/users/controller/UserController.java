@@ -130,7 +130,7 @@ public class UserController {
         } catch (NoSuchElementException e) { // если объект не будет найден
             e.printStackTrace();
         }
-        return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity("id=" + id + " not found", HttpStatus.NO_CONTENT);
     }
 
     // получение уникального объекта по email

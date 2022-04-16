@@ -1,6 +1,7 @@
 package com.example.micro.planner.todo.controller;
 
 import com.example.micro.planner.entity.Category;
+import com.example.micro.planner.entity.User;
 import com.example.micro.planner.todo.feign.UserFeignClient;
 import com.example.micro.planner.todo.search.CategorySearchValues;
 import com.example.micro.planner.todo.service.CategoryService;
@@ -47,7 +48,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Category> add(@RequestBody Category category) {
+    public ResponseEntity add(@RequestBody Category category) {
 
         // проверка на обязательные параметры
         if (category.getId() != null && category.getId() != 0) { // это означает, что id заполнено
@@ -77,12 +78,16 @@ public class CategoryController {
         //userBuilder.userExistsAsync(category.getUserId()).subscribe((user->log.debug(String.valueOf(user)));
 
         // 3. вызов мс с помощью feign
-        if (userFeignClient.findUserById(category.getUserId()) != null) {
-            return ResponseEntity.ok(categoryService.add(category));
+        ResponseEntity<User> result = userFeignClient.findUserById(category.getUserId());
+        if (result == null) { // если мс недоступен - вернется null
+            return new ResponseEntity("система пользователей недоступна, попробуйте позже", HttpStatus.SERVICE_UNAVAILABLE);
         }
-
+        if (result.getBody() == null) {
+            return new ResponseEntity(String.format("user id = %d not found", category.getUserId()), HttpStatus.ACCEPTED);
+        }
+        return ResponseEntity.ok(categoryService.add(category));
         // пользователь не найден
-        return new ResponseEntity(String.format("user id = %d not found", category.getUserId()), HttpStatus.ACCEPTED);
+        // если пользователь не пустой
     }
 
     @PutMapping("/update")
