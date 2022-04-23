@@ -1,7 +1,8 @@
 package com.example.micro.planner.users.controller;
 
 import com.example.micro.planner.entity.User;
-import com.example.micro.planner.users.mq.MessageProducer;
+import com.example.micro.planner.users.mq.func.MessageFuncActions;
+import com.example.micro.planner.users.mq.legacy.MessageProducer;
 import com.example.micro.planner.users.search.UserSearchValues;
 import com.example.micro.planner.users.service.UserService;
 import com.example.micro.planner.utils.userBuilder.webclient.UserWebClientBuilder;
@@ -25,14 +26,16 @@ public class UserController {
     public static final String ID_COLUMN = "id"; // сортируемый столбец
     private final UserService userService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
     private final UserWebClientBuilder userWebClientBuilder;
-    private final MessageProducer messageProducer; // утилита для отправки сообщений
+    //private final MessageProducer messageProducer; // утилита для отправки сообщений
+    private final MessageFuncActions messageFuncActions;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public UserController(UserService userService, UserWebClientBuilder userWebClientBuilder, MessageProducer messageProducer) {
+    public UserController(UserService userService, UserWebClientBuilder userWebClientBuilder,
+                          MessageFuncActions messageFuncActions) {
         this.userService = userService;
         this.userWebClientBuilder = userWebClientBuilder;
-        this.messageProducer = messageProducer;
+        this.messageFuncActions = messageFuncActions;
     }
 
     @PostMapping("/add")
@@ -58,12 +61,15 @@ public class UserController {
         }
 
         user = userService.add(user);
+
+        // отправление сообщения о создании нового пользователя
         if (user != null) {
 //          userWebClientBuilder.initUserData(user.getId()).subscribe(result -> log.info("user populated: " + result));
-            messageProducer.initUserData(user.getId());
+//            messageProducer.initUserData(user.getId());
+            messageFuncActions.sendNewUserMessage(user.getId());
         }
 
-        return ResponseEntity.ok(user); // возвращаем созданный объект со сгенерированным id
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/update")
