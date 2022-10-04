@@ -47,7 +47,7 @@ public class PriorityController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Priority> add(@RequestBody Priority priority) {
+    public ResponseEntity add(@RequestBody Priority priority) {
         // проверка на обязательные параметры
         if (priority.getId() != null && priority.getId() != 0) {
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
@@ -61,7 +61,6 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-
         // проверка на пользователя, вызовом мс из другого модуля
         if(userBuilder.userExists(priority.getUserId())) {
             return ResponseEntity.ok(priorityService.add(priority));  // возвращаем добавленный объект

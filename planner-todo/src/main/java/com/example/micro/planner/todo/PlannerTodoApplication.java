@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableEurekaClient
 @ComponentScan(basePackages = {"com.example.micro.planner"}) // явное указание где искать bean для entities
 @EnableJpaRepositories(basePackages = {"com.example.micro.planner.todo"})
-@EnableFeignClients
+@EnableFeignClients // подключение feign client для вызовы микросервиса
 @RefreshScope
 public class PlannerTodoApplication {
 
